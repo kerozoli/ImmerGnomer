@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'          # triggers on v1.0, v1.2.3, etc.
+
+permissions:
+  contents: write     # needed to create GitHub Releases
+
+jobs:
+  build-and-release:
+    name: Build & Release
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout ──────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Install dependencies ──────────────────────────────────────────────
+      - name: Install glib tools
+        run: sudo apt-get install -y libglib2.0-bin
+
+      # ── 3. Compile GSettings schema ──────────────────────────────────────────
+      - name: Compile GSettings schemas
+        run: glib-compile-schemas schemas/
+
+      # ── 4. Package the extension zip ─────────────────────────────────────────
+      #   GNOME Extensions requires the zip to contain the files at the root
+      #   level (not inside a subdirectory).
+      - name: Create extension zip
+        run: |
+          ZIP_NAME="immergnomer@immerreader.local.zip"
+          zip -r "$ZIP_NAME" \
+            extension.js \
+            prefs.js \
+            metadata.json \
+            schemas/
+          echo "ZIP_NAME=$ZIP_NAME" >> "$GITHUB_ENV"
+
+      # ── 5. Create GitHub Release and upload the zip ───────────────────────────
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "ImmerGnomer ${{ github.ref_name }}"
+          body: |
+            ## ImmerGnomer ${{ github.ref_name }}
+
+            GNOME Shell extension for monitoring your ImmerReader heater status.
+
+            ### Installation
+            1. Download `immergnomer@immerreader.local.zip` below.
+            2. Install via GNOME Extensions app or:
+               ```bash
+               gnome-extensions install immergnomer@immerreader.local.zip
+               gnome-extensions enable immergnomer@immerreader.local
+               ```
+            3. Open **Settings → Extensions → ImmerGnomer → ⚙** to set your API URL.
+          files: ${{ env.ZIP_NAME }}
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}

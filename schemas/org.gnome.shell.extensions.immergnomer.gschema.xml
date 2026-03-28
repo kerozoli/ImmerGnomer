@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.immergnomer"
+          path="/org/gnome/shell/extensions/immergnomer/">
+
+    <key name="api-url" type="s">
+      <default>'http://localhost:8080/api/status'</default>
+      <summary>ImmerReader REST API URL</summary>
+      <description>The full URL of the ImmerReader REST API endpoint that returns heater status.</description>
+    </key>
+
+    <key name="poll-interval" type="i">
+      <default>10</default>
+      <range min="5" max="300"/>
+      <summary>Poll interval in seconds</summary>
+      <description>How often (in seconds) the extension should poll the API for updated heater status.</description>
+    </key>
+
+  </schema>
+</schemalist>
