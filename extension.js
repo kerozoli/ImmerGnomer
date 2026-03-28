@@ -1,5 +1,6 @@
 import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
+import GObject from 'gi://GObject';
 import Soup from 'gi://Soup';
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
@@ -28,6 +29,7 @@ const FLAME = '🔥';
 const SNOWFLAKE = '❄';   // shown when not heating & throttle 0
 
 // ─── Indicator class ─────────────────────────────────────────────────────────
+const ImmerIndicator = GObject.registerClass(
 class ImmerIndicator extends PanelMenu.Button {
 
     _init(settings) {
@@ -126,7 +128,8 @@ class ImmerIndicator extends PanelMenu.Button {
         this._label.style = 'font-size: 14px; padding: 0 4px; color: #FF5555;';
         this._updateRow(this._updatedItem, `Error: ${msg}`);
     }
-}
+});
+
 
 // ─── Main Extension ───────────────────────────────────────────────────────────
 export default class ImmerGnomerExtension extends Extension {
