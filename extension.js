@@ -95,18 +95,21 @@ class ImmerIndicator extends PanelMenu.Button {
     update(data) {
         const {temperature, throttle, heating, boilerOn} = data;
 
+        // Hide the whole indicator when the heater is off
+        this.visible = heating;
+        if (!heating) return;
+
         // ── Panel indicator ──────────────────────────────────────────────────
         const clamped  = Math.max(0, Math.min(4, throttle));
         const color    = THROTTLE_COLORS[clamped];
-        const symbol   = (clamped === 0 && !heating) ? SNOWFLAKE : FLAME;
 
-        this._label.text  = `${symbol} ${temperature}°C`;
+        this._label.text  = `${FLAME} ${temperature}°C`;
         this._label.style = `font-size: 14px; padding: 0 4px; color: ${color};`;
 
         // ── Popup rows ───────────────────────────────────────────────────────
         this._updateRow(this._tempItem,     `${temperature} °C`);
         this._updateRow(this._throttleItem, `${clamped}/4  ${this._throttleBar(clamped)}`);
-        this._updateRow(this._heatingItem,  heating  ? '✔ Yes' : '✘ No');
+        this._updateRow(this._heatingItem,  '✔ Yes');
         this._updateRow(this._boilerItem,   boilerOn ? '✔ On'  : '✘ Off');
 
         const now = new Date();
